@@ -4,7 +4,7 @@ import CardFoodInCart from '../components/CardFoodInCart';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const CartScreen = ({navigation}) => {
-
+    //console.log();
     const [cartItems, changeCartItems] = useState([]);
     const [sumOfCost, setSumCost] = useState(0);
 
@@ -12,6 +12,7 @@ const CartScreen = ({navigation}) => {
         if (!res) changeCartItems([]);
         else {
             changeCartItems(JSON.parse(res));
+            //console.log(cartItems);
         }
 
         let temp = 0;
@@ -55,7 +56,37 @@ const CartScreen = ({navigation}) => {
         );
     };
 
-    const ThanhToan = () => {
+    async function ThanhToan() {
+        let temp = 0;
+        let x = await fetch("https://my-app-food.herokuapp.com/api/orderid", {
+        })
+        .then((response)=>response.json())
+        .then((responseJson)=>{
+            temp = responseJson[0].id_donhang;
+            console.log(responseJson);
+            console.log(temp);
+        });
+        for(let i = 0; i < cartItems.length; i++){
+            let y = await fetch("https://my-app-food.herokuapp.com/api/order", {
+                method: 'POST',
+                headers: { 
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'id': 10 
+                },
+                body: JSON.stringify({
+                    'food_id' : cartItems[i].idFood,
+                    'order_id' : temp + 1,
+                    'num' : cartItems[i].quantity,
+                })
+            })
+            .then((response)=>response.json())
+            .then((responseJson)=>{
+                console.log(responseJson);
+            });
+        }
+
+        //console.log(temp);
         AsyncStorage.setItem("CART", JSON.stringify([]));
         navigation.navigate('ShippingScreen');
     };
